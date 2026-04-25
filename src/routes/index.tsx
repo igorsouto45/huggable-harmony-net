@@ -48,7 +48,6 @@ function Index() {
             <a href="#" className="hover:text-secondary transition-colors">Regras do Sorteio</a>
             <a href="#" className="hover:text-secondary transition-colors">Termos de Uso</a>
             <a href="#" className="hover:text-secondary transition-colors">Privacidade</a>
-            <Link to="/admin" className="hover:text-secondary transition-colors">Painel Admin</Link>
           </div>
           <div className="pt-4">
             <Link 

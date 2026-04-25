@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Hero } from "@/components/landing/Hero";
 import { PackageSelector } from "@/components/landing/PackageSelector";
 import { ProductDetails } from "@/components/landing/ProductDetails";
@@ -48,6 +48,14 @@ function Index() {
             <a href="#" className="hover:text-secondary transition-colors">Regras do Sorteio</a>
             <a href="#" className="hover:text-secondary transition-colors">Termos de Uso</a>
             <a href="#" className="hover:text-secondary transition-colors">Privacidade</a>
+          </div>
+          <div className="pt-4">
+            <Link 
+              to="/admin" 
+              className="inline-flex items-center justify-center px-4 py-2 text-sm font-bold text-primary bg-secondary rounded-full hover:bg-secondary/90 transition-colors shadow-lg"
+            >
+              Painel Admin
+            </Link>
           </div>
           <div className="pt-6 border-t border-white/5 opacity-50 text-[10px] uppercase tracking-widest">
             Desenvolvido com foco total em conversão

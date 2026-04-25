@@ -50,6 +50,14 @@ function Index() {
             <a href="#" className="hover:text-secondary transition-colors">Privacidade</a>
             <Link to="/admin" className="hover:text-secondary transition-colors">Painel Admin</Link>
           </div>
+          <div className="pt-4">
+            <Link 
+              to="/admin" 
+              className="inline-flex items-center justify-center px-4 py-2 text-sm font-bold text-primary bg-secondary rounded-full hover:bg-secondary/90 transition-colors shadow-lg"
+            >
+              Painel Admin
+            </Link>
+          </div>
           <div className="pt-6 border-t border-white/5 opacity-50 text-[10px] uppercase tracking-widest">
             Desenvolvido com foco total em conversão
           </div>

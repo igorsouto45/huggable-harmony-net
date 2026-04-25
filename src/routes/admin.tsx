@@ -28,7 +28,64 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminLayout() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simple demo authentication
+    if (username === "admin" && password === "admin123") {
+      setIsAuthenticated(true);
+    } else {
+      alert("Credenciais inválidas");
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+        <Card className="w-full max-w-md p-8">
+          <div className="flex flex-col items-center gap-2 mb-8">
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+              <LayoutDashboard className="text-primary-foreground" size={24} />
+            </div>
+            <h1 className="text-2xl font-black tracking-tight">PREMIA ADMIN</h1>
+            <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
+          </div>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Usuário</Label>
+              <Input 
+                id="username" 
+                type="text" 
+                value={username} 
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="admin"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input 
+                id="password" 
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6">
+              ENTRAR NO PAINEL
+            </Button>
+          </form>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col md:flex-row">
@@ -45,6 +102,16 @@ function AdminLayout() {
           <NavItem icon={<Users size={20}/>} label="Participantes" active={activeTab === "users"} onClick={() => setActiveTab("users")} />
           <NavItem icon={<Settings size={20}/>} label="Configurações" active={activeTab === "settings"} onClick={() => setActiveTab("settings")} />
         </nav>
+
+        <div className="absolute bottom-8 left-6 right-6">
+           <Button 
+            variant="secondary" 
+            className="w-full font-bold"
+            onClick={() => setIsAuthenticated(false)}
+          >
+            Sair
+          </Button>
+        </div>
       </aside>
 
       {/* Main Content */}

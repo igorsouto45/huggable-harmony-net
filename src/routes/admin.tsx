@@ -53,6 +53,9 @@ function AdminLayout() {
             </div>
             <h1 className="text-2xl font-black tracking-tight">PREMIA ADMIN</h1>
             <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
+            <div className="bg-primary/10 p-2 rounded text-[10px] font-mono text-primary mt-2 uppercase tracking-wider">
+              Dica: admin / admin123
+            </div>
           </div>
           
           <form onSubmit={handleLogin} className="space-y-4">

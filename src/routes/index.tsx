@@ -1,26 +1,59 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Hero } from "@/components/landing/Hero";
+import { PackageSelector } from "@/components/landing/PackageSelector";
+import { ProductDetails } from "@/components/landing/ProductDetails";
+import { Winners } from "@/components/landing/Winners";
+import { Urgency } from "@/components/landing/Urgency";
+import { CheckoutForm } from "@/components/landing/CheckoutForm";
+import { WhatsAppButton } from "@/components/landing/WhatsAppButton";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
+function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-secondary selection:text-secondary-foreground">
+      {/* WhatsApp Floating Button */}
+      <WhatsAppButton />
+
+      <main>
+        {/* 1. Hero Section */}
+        <Hero />
+
+        {/* 5. Urgency Bar (Positioned high for conversion) */}
+        <Urgency />
+
+        {/* 2. Buy Block (Package Selection) */}
+        <PackageSelector />
+
+        {/* 3. Product Details */}
+        <ProductDetails />
+
+        {/* 4. Social Proof */}
+        <Winners />
+
+        {/* 6. Checkout Section */}
+        <CheckoutForm />
+      </main>
+
+      <footer className="py-12 px-6 bg-primary text-primary-foreground border-t border-white/10">
+        <div className="container mx-auto text-center space-y-6">
+          <h2 className="text-2xl font-black">PREMIA</h2>
+          <p className="max-w-md mx-auto opacity-70 text-sm">
+            Plataforma digital de sorteios autorizados. Participe com responsabilidade.
+            Todos os direitos reservados &copy; {new Date().getFullYear()}
+          </p>
+          <div className="flex justify-center gap-6 text-sm font-bold opacity-80">
+            <a href="#" className="hover:text-secondary transition-colors">Regras do Sorteio</a>
+            <a href="#" className="hover:text-secondary transition-colors">Termos de Uso</a>
+            <a href="#" className="hover:text-secondary transition-colors">Privacidade</a>
+          </div>
+          <div className="pt-6 border-t border-white/5 opacity-50 text-[10px] uppercase tracking-widest">
+            Desenvolvido com foco total em conversão
+          </div>
+        </div>
+      </footer>
     </div>
   );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
 }

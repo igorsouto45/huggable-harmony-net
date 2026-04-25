@@ -29,8 +29,14 @@ export const CheckoutForm = () => {
           <Card className="p-10 border-2 border-green-500 shadow-2xl">
             <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto mb-6" />
             <h2 className="text-3xl font-black mb-4">Pedido Reservado!</h2>
-            <p className="text-lg mb-8 text-muted-foreground">
-              Para garantir seus números, realize o pagamento via <strong>PIX</strong> agora.
+            <p className="text-lg mb-4 text-muted-foreground">
+              Seus números reservados: <br/>
+              <span className="text-primary font-black text-2xl tracking-widest">
+                452, 891, 102, 334, 056...
+              </span>
+            </p>
+            <p className="text-base mb-8 text-muted-foreground">
+              Para garantir sua participação, realize o pagamento via <strong>PIX</strong> agora.
             </p>
             
             <div className="bg-muted p-6 rounded-2xl mb-8 flex flex-col items-center">

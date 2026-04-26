@@ -5,17 +5,29 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { ShieldCheck, Smartphone, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { generateRandomNumbers } from "@/lib/raffle";
 
-export const CheckoutForm = () => {
+export const CheckoutForm = ({ selectedPackage }: { selectedPackage: any }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [assignedNumbers, setAssignedNumbers] = useState<number[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedPackage) {
+      toast.error("Por favor, selecione um pacote primeiro.");
+      return;
+    }
+
     setLoading(true);
     
-    // Simulate API call
+    // Simulate number assignment and payment generation
     setTimeout(() => {
+      // For demo purposes, we assume numbers 1-1000 are available
+      const available = Array.from({ length: 1000 }, (_, i) => i + 1);
+      const numbers = generateRandomNumbers(available, selectedPackage.tickets);
+      setAssignedNumbers(numbers);
+      
       setLoading(false);
       setSuccess(true);
       toast.success("Pedido gerado com sucesso!");

@@ -11,7 +11,7 @@ export const Hero = () => {
       </div>
       <div className="container mx-auto relative z-10 flex flex-col items-center text-center">
         <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-in fade-in slide-in-from-top-4 duration-1000">
-          PREMIA
+          PREMIA SEMPRE
         </h1>
         <h2 className="text-2xl md:text-4xl font-extrabold mb-2 tracking-tight">
           Ganhe produtos desejados pagando pouco

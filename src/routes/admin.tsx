@@ -437,6 +437,7 @@ function UsersView() {
 
 function SettingsView() {
   const [mercadoPagoToken, setMercadoPagoToken] = useState("");
+  const [mercadoPagoPublicKey, setMercadoPagoPublicKey] = useState("");
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
@@ -448,24 +449,69 @@ function SettingsView() {
       <Card className="p-8">
         <div className="flex items-center gap-3 mb-6">
           <CreditCard className="text-primary" size={24} />
-          <h3 className="text-xl font-bold">Integração Mercado Pago</h3>
+          <h3 className="text-xl font-bold">Configuração de Pagamento</h3>
         </div>
         
         <form onSubmit={handleSaveSettings} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="mp_token">Access Token (Produção)</Label>
-            <Input 
-              id="mp_token" 
-              type="password" 
-              value={mercadoPagoToken}
-              onChange={(e) => setMercadoPagoToken(e.target.value)}
-              placeholder="APP_USR-..." 
-            />
-            <p className="text-xs text-muted-foreground">Utilizado para processar pagamentos via PIX automaticamente.</p>
+          <div className="bg-muted/50 p-4 rounded-lg border border-border mb-6">
+            <h4 className="font-bold text-sm mb-2 flex items-center gap-2">
+              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+              Integração Mercado Pago
+            </h4>
+            <p className="text-xs text-muted-foreground">
+              Configure suas credenciais do Mercado Pago para aceitar pagamentos via PIX e Cartão de Crédito.
+            </p>
           </div>
 
-          <Button type="submit" className="w-full font-bold">SALVAR CONFIGURAÇÕES</Button>
+          <div className="grid grid-cols-1 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="mp_public_key">Public Key (Produção)</Label>
+              <Input 
+                id="mp_public_key" 
+                value={mercadoPagoPublicKey}
+                onChange={(e) => setMercadoPagoPublicKey(e.target.value)}
+                placeholder="APP_USR-..." 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="mp_token">Access Token (Produção)</Label>
+              <Input 
+                id="mp_token" 
+                type="password" 
+                value={mercadoPagoToken}
+                onChange={(e) => setMercadoPagoToken(e.target.value)}
+                placeholder="APP_USR-..." 
+              />
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                Mantenha seu token em segurança. Nunca compartilhe com ninguém.
+              </p>
+            </div>
+          </div>
+
+          <Button type="submit" className="w-full font-bold py-6 text-lg">
+            SALVAR CONFIGURAÇÕES DE API
+          </Button>
         </form>
+      </Card>
+
+      <Card className="p-8 border-dashed border-2">
+        <div className="flex flex-col items-center text-center space-y-4">
+          <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center">
+            <AlertCircle className="text-muted-foreground" size={24} />
+          </div>
+          <div>
+            <h4 className="font-bold">Como obter as credenciais?</h4>
+            <p className="text-sm text-muted-foreground mt-1">
+              Acesse o painel do Mercado Pago Developers, crie uma aplicação e vá em "Credenciais de Produção".
+            </p>
+          </div>
+          <Button variant="outline" size="sm" asChild>
+            <a href="https://www.mercadopago.com.br/developers/panel" target="_blank" rel="noreferrer">
+              Ir para Mercado Pago Developers
+            </a>
+          </Button>
+        </div>
       </Card>
     </div>
   );

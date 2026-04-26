@@ -31,7 +31,15 @@ export const CheckoutForm = ({ selectedPackage }: { selectedPackage: RafflePacka
   };
 
 
+  const pixCode = "00020126330014br.gov.bcb.pix0111CHAVEPIXSIMULADA520400005303986540510.005802BR5915NOME_DO_RECEBEDOR6008BRASILIA62070503***6304E2D1";
+
+  const handleCopyPix = () => {
+    navigator.clipboard.writeText(pixCode);
+    toast.success("Código PIX copiado!");
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
+
     e.preventDefault();
     if (!selectedPackage) {
       toast.error("Por favor, selecione um pacote primeiro.");

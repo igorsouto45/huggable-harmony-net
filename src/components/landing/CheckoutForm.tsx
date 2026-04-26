@@ -14,7 +14,32 @@ export const CheckoutForm = ({ selectedPackage }: { selectedPackage: RafflePacka
   const [assignedNumbers, setAssignedNumbers] = useState<number[]>([]);
   const [formData, setFormData] = useState({ name: "", whatsapp: "" });
 
+  const formatWhatsApp = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 11) {
+      return numbers
+        .replace(/^(\d{2})(\d)/g, "($1) $2")
+        .replace(/(\d{5})(\d)/, "$1-$2")
+        .substring(0, 15);
+    }
+    return value.substring(0, 15);
+  };
+
+  const handleWhatsAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatWhatsApp(e.target.value);
+    setFormData({ ...formData, whatsapp: formatted });
+  };
+
+
+  const pixCode = "00020126330014br.gov.bcb.pix0111CHAVEPIXSIMULADA520400005303986540510.005802BR5915NOME_DO_RECEBEDOR6008BRASILIA62070503***6304E2D1";
+
+  const handleCopyPix = () => {
+    navigator.clipboard.writeText(pixCode);
+    toast.success("Código PIX copiado!");
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
+
     e.preventDefault();
     if (!selectedPackage) {
       toast.error("Por favor, selecione um pacote primeiro.");
@@ -62,10 +87,11 @@ export const CheckoutForm = ({ selectedPackage }: { selectedPackage: RafflePacka
               <div className="bg-white p-2 rounded-xl mb-4">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ChavePixSimulada" alt="QR Code PIX" className="w-48 h-48" />
               </div>
-              <p className="text-xs font-mono break-all text-center mb-4">
-                00020126330014br.gov.bcb.pix0111CHAVEPIXSIMULADA...
+              <p className="text-xs font-mono break-all text-center mb-4 max-w-[200px]">
+                {pixCode}
               </p>
-              <Button variant="outline" className="w-full font-bold">COPIAR CÓDIGO PIX</Button>
+              <Button onClick={handleCopyPix} variant="outline" className="w-full font-bold">COPIAR CÓDIGO PIX</Button>
+
             </div>
 
             <Button className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white font-bold py-6 text-lg">
@@ -108,7 +134,7 @@ export const CheckoutForm = ({ selectedPackage }: { selectedPackage: RafflePacka
                 required 
                 className="py-6 text-lg" 
                 value={formData.whatsapp}
-                onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                onChange={handleWhatsAppChange}
               />
             </div>
 

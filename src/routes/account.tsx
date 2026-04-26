@@ -88,15 +88,45 @@ function AccountLayout() {
   if (!session) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 p-4">
-        <Card className="w-full max-w-md p-8 text-center">
-          <User className="mx-auto mb-4 text-primary" size={48} />
-          <h1 className="text-2xl font-bold mb-2">Área do Cliente</h1>
-          <p className="text-muted-foreground mb-6">Faça login para gerenciar suas compras e ver seus números.</p>
-          <Button onClick={() => window.location.href = "/"} className="w-full font-bold">VOLTAR PARA O INÍCIO</Button>
+        <Card className="w-full max-w-md p-8">
+          <div className="text-center mb-8">
+            <User className="mx-auto mb-4 text-primary" size={48} />
+            <h1 className="text-2xl font-bold mb-2">Área do Cliente</h1>
+            <p className="text-muted-foreground">Entre com seus dados para ver seus números</p>
+          </div>
+          
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            const email = (e.currentTarget.elements.namedItem("email") as HTMLInputElement).value;
+            const password = (e.currentTarget.elements.namedItem("password") as HTMLInputElement).value;
+            
+            setLoading(true);
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) {
+              toast.error("Credenciais inválidas ou conta não encontrada.");
+            } else {
+              toast.success("Bem-vindo de volta!");
+            }
+            setLoading(false);
+          }} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-bold">E-mail</label>
+              <input name="email" type="email" required className="w-full p-3 rounded-lg border bg-background" placeholder="seu@email.com" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold">Senha</label>
+              <input name="password" type="password" required className="w-full p-3 rounded-lg border bg-background" placeholder="••••••••" />
+            </div>
+            <Button type="submit" className="w-full font-bold py-6" disabled={loading}>
+              {loading ? "CARREGANDO..." : "ENTRAR"}
+            </Button>
+            <Button variant="ghost" onClick={() => navigate({ to: "/" })} className="w-full">VOLTAR PARA O INÍCIO</Button>
+          </form>
         </Card>
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-muted/30 p-4 md:p-8">

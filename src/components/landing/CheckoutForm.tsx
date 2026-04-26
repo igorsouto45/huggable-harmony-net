@@ -14,6 +14,23 @@ export const CheckoutForm = ({ selectedPackage }: { selectedPackage: RafflePacka
   const [assignedNumbers, setAssignedNumbers] = useState<number[]>([]);
   const [formData, setFormData] = useState({ name: "", whatsapp: "" });
 
+  const formatWhatsApp = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 11) {
+      return numbers
+        .replace(/^(\d{2})(\d)/g, "($1) $2")
+        .replace(/(\d{5})(\d)/, "$1-$2")
+        .substring(0, 15);
+    }
+    return value.substring(0, 15);
+  };
+
+  const handleWhatsAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatWhatsApp(e.target.value);
+    setFormData({ ...formData, whatsapp: formatted });
+  };
+
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedPackage) {

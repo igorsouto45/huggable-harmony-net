@@ -6,16 +6,23 @@ import { Card } from "@/components/ui/card";
 import { ShieldCheck, Smartphone, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { generateRandomNumbers } from "@/lib/raffle";
+import { type RafflePackage } from "@/routes/index";
 
-export const CheckoutForm = ({ selectedPackage }: { selectedPackage: any }) => {
+export const CheckoutForm = ({ selectedPackage }: { selectedPackage: RafflePackage | null }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [assignedNumbers, setAssignedNumbers] = useState<number[]>([]);
+  const [formData, setFormData] = useState({ name: "", whatsapp: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedPackage) {
       toast.error("Por favor, selecione um pacote primeiro.");
+      return;
+    }
+
+    if (formData.whatsapp.replace(/\D/g, "").length < 10) {
+      toast.error("Por favor, insira um número de WhatsApp válido.");
       return;
     }
 

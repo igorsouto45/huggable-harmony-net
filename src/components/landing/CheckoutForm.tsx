@@ -125,7 +125,7 @@ export const CheckoutForm = ({ selectedPackage }: { selectedPackage: RafflePacka
                 required 
                 className="py-6 text-lg" 
                 value={formData.whatsapp}
-                onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                onChange={handleWhatsAppChange}
               />
             </div>
 

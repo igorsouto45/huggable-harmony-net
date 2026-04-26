@@ -10,8 +10,11 @@ export function generateRandomNumbers(availableNumbers: number[], count: number)
   const selected: number[] = [];
   const pool = [...availableNumbers];
 
+  const cryptoArray = new Uint32Array(count);
+  crypto.getRandomValues(cryptoArray);
+
   for (let i = 0; i < count; i++) {
-    const randomIndex = Math.floor(Math.random() * pool.length);
+    const randomIndex = cryptoArray[i] % pool.length;
     selected.push(pool[randomIndex]);
     // Remove selected number from pool to avoid duplicates in the same purchase
     pool.splice(randomIndex, 1);

@@ -8,12 +8,21 @@ import { Urgency } from "@/components/landing/Urgency";
 import { CheckoutForm } from "@/components/landing/CheckoutForm";
 import { WhatsAppButton } from "@/components/landing/WhatsAppButton";
 
+export interface RafflePackage {
+  id: string;
+  name: string;
+  tickets: number;
+  price: string;
+  badge?: string;
+  isPopular?: boolean;
+}
+
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  const [selectedPackage, setSelectedPackage] = useState<any>(null);
+  const [selectedPackage, setSelectedPackage] = useState<RafflePackage | null>(null);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-secondary selection:text-secondary-foreground">

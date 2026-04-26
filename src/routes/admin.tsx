@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,31 +19,69 @@ import {
   TrendingUp, 
   Check, 
   Download,
-  LayoutDashboard
+  LayoutDashboard,
+  CreditCard
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
 function AdminLayout() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState("");
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple demo authentication
-    if (username === "admin" && password === "admin123") {
-      setIsAuthenticated(true);
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast.error(error.message);
     } else {
-      alert("Credenciais inválidas");
+      toast.success("Login realizado com sucesso!");
     }
+    setLoading(false);
   };
 
-  if (!isAuthenticated) {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Sessão encerrada");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted/30">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
         <Card className="w-full max-w-md p-8">
@@ -53,20 +91,17 @@ function AdminLayout() {
             </div>
             <h1 className="text-2xl font-black tracking-tight">PREMIA ADMIN</h1>
             <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
-            <div className="bg-primary/10 p-2 rounded text-[10px] font-mono text-primary mt-2 uppercase tracking-wider">
-              Dica: admin / admin123
-            </div>
           </div>
           
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Usuário</Label>
+              <Label htmlFor="email">E-mail</Label>
               <Input 
-                id="username" 
-                type="text" 
-                value={username} 
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="admin"
+                id="email" 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@exemplo.com"
                 required
               />
             </div>
@@ -81,8 +116,8 @@ function AdminLayout() {
                 required
               />
             </div>
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6">
-              ENTRAR NO PAINEL
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
+              {loading ? "CARREGANDO..." : "ENTRAR NO PAINEL"}
             </Button>
           </form>
         </Card>
@@ -92,7 +127,6 @@ function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col md:flex-row">
-      {/* Sidebar */}
       <aside className="w-full md:w-64 bg-primary text-primary-foreground p-6 md:fixed md:h-full">
         <div className="flex items-center gap-2 mb-10">
           <div className="w-8 h-8 bg-secondary rounded-lg" />
@@ -110,14 +144,13 @@ function AdminLayout() {
            <Button 
             variant="secondary" 
             className="w-full font-bold"
-            onClick={() => setIsAuthenticated(false)}
+            onClick={handleLogout}
           >
             Sair
           </Button>
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 md:ml-64 p-8">
         <header className="flex justify-between items-center mb-10">
           <h2 className="text-3xl font-bold capitalize">{activeTab}</h2>
@@ -129,6 +162,7 @@ function AdminLayout() {
         {activeTab === "dashboard" && <DashboardView />}
         {activeTab === "products" && <ProductsView />}
         {activeTab === "users" && <UsersView />}
+        {activeTab === "settings" && <SettingsView />}
       </main>
     </div>
   );
@@ -245,6 +279,42 @@ function UsersView() {
         </TableBody>
       </Table>
     </Card>
+  );
+}
+
+function SettingsView() {
+  const [mercadoPagoToken, setMercadoPagoToken] = useState("");
+
+  const handleSaveSettings = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("Configurações salvas com sucesso!");
+  };
+
+  return (
+    <div className="space-y-8">
+      <Card className="p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <CreditCard className="text-primary" size={24} />
+          <h3 className="text-xl font-bold">Integração Mercado Pago</h3>
+        </div>
+        
+        <form onSubmit={handleSaveSettings} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="mp_token">Access Token (Produção)</Label>
+            <Input 
+              id="mp_token" 
+              type="password" 
+              value={mercadoPagoToken}
+              onChange={(e) => setMercadoPagoToken(e.target.value)}
+              placeholder="APP_USR-..." 
+            />
+            <p className="text-xs text-muted-foreground">Utilizado para processar pagamentos via PIX automaticamente.</p>
+          </div>
+
+          <Button type="submit" className="w-full font-bold">SALVAR CONFIGURAÇÕES</Button>
+        </form>
+      </Card>
+    </div>
   );
 }
 

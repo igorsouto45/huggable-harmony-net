@@ -10,7 +10,7 @@ const packages = [
   { id: 4, name: "Diamante", tickets: 30, price: 20, popular: true },
 ];
 
-export const PackageSelector = () => {
+export const PackageSelector = ({ onSelect }: { onSelect: (pkg: any) => void }) => {
   return (
     <section id="packages" className="py-16 px-4 bg-background">
       <div className="container mx-auto max-w-4xl">
@@ -58,11 +58,10 @@ export const PackageSelector = () => {
                   pkg.popular ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : "bg-primary text-primary-foreground"
                 )}
                 onClick={() => {
-                  // In a real app, this would trigger the checkout modal
+                  onSelect(pkg);
                   const checkoutSection = document.getElementById('checkout');
                   if (checkoutSection) {
                     checkoutSection.scrollIntoView({ behavior: 'smooth' });
-                    // Trigger some event to pre-select this package
                   }
                 }}
               >

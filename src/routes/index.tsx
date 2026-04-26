@@ -7,6 +7,7 @@ import { Winners } from "@/components/landing/Winners";
 import { Urgency } from "@/components/landing/Urgency";
 import { CheckoutForm } from "@/components/landing/CheckoutForm";
 import { WhatsAppButton } from "@/components/landing/WhatsAppButton";
+import { Logo } from "@/components/Logo";
 
 import { type RafflePackage } from "@/lib/types";
 

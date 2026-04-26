@@ -35,6 +35,7 @@ function AdminLayout() {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -54,18 +55,31 @@ function AdminLayout() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      toast.error(error.message);
+    
+    if (isRegistering) {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Conta criada com sucesso! Você já pode entrar.");
+        setIsRegistering(false);
+      }
     } else {
-      toast.success("Login realizado com sucesso!");
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Login realizado com sucesso!");
+      }
     }
     setLoading(false);
   };
@@ -97,7 +111,7 @@ function AdminLayout() {
             <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
           </div>
           
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleAuth} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
               <Input 
@@ -121,8 +135,16 @@ function AdminLayout() {
               />
             </div>
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
-              {loading ? "CARREGANDO..." : "ENTRAR NO PAINEL"}
+              {loading ? "CARREGANDO..." : (isRegistering ? "CRIAR CONTA ADMIN" : "ENTRAR NO PAINEL")}
             </Button>
+
+            <button
+              type="button"
+              onClick={() => setIsRegistering(!isRegistering)}
+              className="w-full text-sm text-muted-foreground hover:text-primary transition-colors text-center mt-4"
+            >
+              {isRegistering ? "Já tem uma conta? Entre aqui" : "Não tem uma conta? Crie uma aqui"}
+            </button>
           </form>
         </Card>
       </div>

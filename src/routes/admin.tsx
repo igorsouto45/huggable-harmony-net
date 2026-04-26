@@ -145,10 +145,10 @@ function AdminLayout() {
         <div className="w-full max-w-md space-y-4">
           <Card className="p-8">
             <div className="flex flex-col items-center gap-2 mb-8">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-                <LayoutDashboard className="text-primary-foreground" size={24} />
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center font-black text-primary-foreground">
+                PS
               </div>
-              <h1 className="text-2xl font-black tracking-tight">PREMIA ADMIN</h1>
+              <h1 className="text-2xl font-black tracking-tight">PREMIA SEMPRE</h1>
               <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
             </div>
             
@@ -466,6 +466,116 @@ function SettingsView() {
 
           <Button type="submit" className="w-full font-bold">SALVAR CONFIGURAÇÕES</Button>
         </form>
+      </Card>
+    </div>
+  );
+}
+
+function CustomizationView() {
+  const [settings, setSettings] = useState({
+    title: "Premia Sempre",
+    heroTitle: "GANHE PRODUTOS DESEJADOS PAGANDO POUCO",
+    heroSubtitle: "Participe de sorteios diários e concorra a produtos incríveis por preços baixos.",
+    whatsappNumber: "5511999999999",
+    primaryColor: "#000000",
+    secondaryColor: "#EAB308",
+  });
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("Personalização salva com sucesso!");
+  };
+
+  return (
+    <div className="space-y-8">
+      <Card className="p-8">
+        <h3 className="text-xl font-bold mb-6">Informações Gerais</h3>
+        <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label>Nome do Site</Label>
+            <Input 
+              value={settings.title} 
+              onChange={e => setSettings({...settings, title: e.target.value})}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>WhatsApp (com DDD)</Label>
+            <Input 
+              value={settings.whatsappNumber} 
+              onChange={e => setSettings({...settings, whatsappNumber: e.target.value})}
+            />
+          </div>
+          <div className="md:col-span-2 space-y-2">
+            <Label>Título Hero (Principal)</Label>
+            <Input 
+              value={settings.heroTitle} 
+              onChange={e => setSettings({...settings, heroTitle: e.target.value})}
+            />
+          </div>
+          <div className="md:col-span-2 space-y-2">
+            <Label>Subtítulo Hero</Label>
+            <Input 
+              value={settings.heroSubtitle} 
+              onChange={e => setSettings({...settings, heroSubtitle: e.target.value})}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label>Logo do Site</Label>
+            <div className="flex gap-4 items-center">
+              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center font-black text-primary-foreground text-xs shrink-0">
+                {settings.title.split(' ').map(w => w[0]).join('')}
+              </div>
+              <Input type="file" className="text-xs" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Favicon</Label>
+            <Input type="file" className="text-xs" />
+          </div>
+
+          <div className="md:col-span-2">
+            <Button type="submit" className="w-full py-6 font-bold">SALVAR ALTERAÇÕES</Button>
+          </div>
+        </form>
+      </Card>
+
+      <Card className="p-8">
+        <h3 className="text-xl font-bold mb-6">Configuração de Pacotes</h3>
+        <p className="text-sm text-muted-foreground mb-4">Ajuste os valores e quantidades dos pacotes de rifa.</p>
+        
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nome</TableHead>
+              <TableHead>Bilhetes</TableHead>
+              <TableHead>Preço (R$)</TableHead>
+              <TableHead>Destaque</TableHead>
+              <TableHead>Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="font-medium">Bronze</TableCell>
+              <TableCell>1</TableCell>
+              <TableCell>5,00</TableCell>
+              <TableCell>Não</TableCell>
+              <TableCell><Button variant="ghost" size="sm">Editar</Button></TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium">Diamante</TableCell>
+              <TableCell>30</TableCell>
+              <TableCell>20,00</TableCell>
+              <TableCell><span className="text-secondary font-bold text-xs uppercase">Sim</span></TableCell>
+              <TableCell><Button variant="ghost" size="sm">Editar</Button></TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+        
+        <Button variant="outline" className="w-full mt-6 border-dashed">
+          <PlusCircle className="mr-2 h-4 w-4" /> ADICIONAR NOVO PACOTE
+        </Button>
       </Card>
     </div>
   );

@@ -87,10 +87,11 @@ export const CheckoutForm = ({ selectedPackage }: { selectedPackage: RafflePacka
               <div className="bg-white p-2 rounded-xl mb-4">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=ChavePixSimulada" alt="QR Code PIX" className="w-48 h-48" />
               </div>
-              <p className="text-xs font-mono break-all text-center mb-4">
-                00020126330014br.gov.bcb.pix0111CHAVEPIXSIMULADA...
+              <p className="text-xs font-mono break-all text-center mb-4 max-w-[200px]">
+                {pixCode}
               </p>
-              <Button variant="outline" className="w-full font-bold">COPIAR CÓDIGO PIX</Button>
+              <Button onClick={handleCopyPix} variant="outline" className="w-full font-bold">COPIAR CÓDIGO PIX</Button>
+
             </div>
 
             <Button className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white font-bold py-6 text-lg">

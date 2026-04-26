@@ -7,14 +7,9 @@ import { Winners } from "@/components/landing/Winners";
 import { Urgency } from "@/components/landing/Urgency";
 import { CheckoutForm } from "@/components/landing/CheckoutForm";
 import { WhatsAppButton } from "@/components/landing/WhatsAppButton";
+import { Logo } from "@/components/Logo";
 
-export interface RafflePackage {
-  id: number;
-  name: string;
-  tickets: number;
-  price: number;
-  popular: boolean;
-}
+import { type RafflePackage } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -50,7 +45,9 @@ function Index() {
 
       <footer className="py-12 px-6 bg-primary text-primary-foreground border-t border-white/10">
         <div className="container mx-auto text-center space-y-6">
-          <h2 className="text-2xl font-black">PREMIA</h2>
+          <div className="flex justify-center mb-6">
+            <Logo />
+          </div>
           <p className="max-w-md mx-auto opacity-70 text-sm">
             Plataforma digital de sorteios autorizados. Participe com responsabilidade.
             Todos os direitos reservados &copy; {new Date().getFullYear()}

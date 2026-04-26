@@ -111,7 +111,7 @@ function AdminLayout() {
             <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
           </div>
           
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleAuth} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
               <Input 
@@ -135,8 +135,16 @@ function AdminLayout() {
               />
             </div>
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
-              {loading ? "CARREGANDO..." : "ENTRAR NO PAINEL"}
+              {loading ? "CARREGANDO..." : (isRegistering ? "CRIAR CONTA ADMIN" : "ENTRAR NO PAINEL")}
             </Button>
+
+            <button
+              type="button"
+              onClick={() => setIsRegistering(!isRegistering)}
+              className="w-full text-sm text-muted-foreground hover:text-primary transition-colors text-center mt-4"
+            >
+              {isRegistering ? "Já tem uma conta? Entre aqui" : "Não tem uma conta? Crie uma aqui"}
+            </button>
           </form>
         </Card>
       </div>

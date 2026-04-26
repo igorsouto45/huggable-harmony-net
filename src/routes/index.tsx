@@ -45,7 +45,9 @@ function Index() {
 
       <footer className="py-12 px-6 bg-primary text-primary-foreground border-t border-white/10">
         <div className="container mx-auto text-center space-y-6">
-          <h2 className="text-2xl font-black text-secondary">PREMIA SEMPRE</h2>
+          <div className="flex justify-center mb-6">
+            <Logo />
+          </div>
           <p className="max-w-md mx-auto opacity-70 text-sm">
             Plataforma digital de sorteios autorizados. Participe com responsabilidade.
             Todos os direitos reservados &copy; {new Date().getFullYear()}

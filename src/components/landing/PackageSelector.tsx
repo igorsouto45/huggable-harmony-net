@@ -26,7 +26,15 @@ export const PackageSelector = ({ onSelect }: { onSelect: (pkg: RafflePackage) =
                 "relative flex flex-col p-6 transition-all duration-300 hover:shadow-xl cursor-pointer",
                 pkg.popular ? "border-secondary border-4 scale-105 shadow-2xl z-10" : "border-border"
               )}
+              onClick={() => {
+                onSelect(pkg);
+                const checkoutSection = document.getElementById('checkout');
+                if (checkoutSection) {
+                  checkoutSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
             >
+
               {pkg.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                   Mais escolhido

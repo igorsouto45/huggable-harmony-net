@@ -21,11 +21,16 @@ import {
   Check, 
   Download,
   LayoutDashboard,
-  CreditCard
+  CreditCard,
+  AlertCircle,
+  CheckCircle2,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured, supabaseConfig } from "@/lib/supabase";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -39,8 +44,14 @@ function AdminLayout() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [testingConnection, setTestingConnection] = useState(false);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setShowDiagnostics(true);
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
@@ -55,33 +66,76 @@ function AdminLayout() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const handleTestConnection = async () => {
+    setTestingConnection(true);
+    try {
+      const { data, error } = await supabase.from('products').select('count', { count: 'exact', head: true });
+      if (error) throw error;
+      toast.success("Conexão com Supabase estabelecida com sucesso!");
+    } catch (error: any) {
+      console.error("Connection test failed:", error);
+      toast.error(`Falha na conexão: ${error.message || "Erro desconhecido"}`);
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    if (isRegistering) {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-      if (error) {
-        toast.error(error.message);
+    try {
+      if (isRegistering) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) {
+          if (error.message.includes("User already registered")) {
+            toast.error("Este e-mail já está cadastrado.");
+          } else {
+            toast.error(`Erro ao criar conta: ${error.message}`);
+          }
+        } else {
+          toast.success("Conta de administrador criada com sucesso! Verifique seu e-mail se necessário.");
+          setIsRegistering(false);
+        }
       } else {
-        toast.success("Conta criada com sucesso! Você já pode entrar.");
-        setIsRegistering(false);
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error) {
+          if (error.message === "Invalid login credentials") {
+            // Tenta criar o usuário automaticamente se ele não existir
+            toast.info("Credenciais inválidas. Verificando se o usuário existe...");
+            const { error: signUpError } = await supabase.auth.signUp({
+              email,
+              password,
+            });
+
+            if (signUpError) {
+              if (signUpError.message.includes("already registered")) {
+                toast.error("Senha incorreta para este e-mail.");
+              } else {
+                toast.error(`Erro na conexão com o Supabase: ${signUpError.message}`);
+              }
+            } else {
+              toast.success("Primeiro administrador criado com sucesso! Você já pode entrar.");
+            }
+          } else {
+            toast.error(`Erro no login: ${error.message}`);
+          }
+        } else {
+          toast.success("Login realizado com sucesso!");
+        }
       }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) {
-        toast.error(error.message);
-      } else {
-        toast.success("Login realizado com sucesso!");
-      }
+    } catch (err: any) {
+      toast.error("Ocorreu um erro inesperado na comunicação com o servidor.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleLogout = async () => {
@@ -102,56 +156,127 @@ function AdminLayout() {
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
-        <Card className="w-full max-w-md p-8">
-          <div className="flex flex-col items-center gap-2 mb-8">
-            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-              <LayoutDashboard className="text-primary-foreground" size={24} />
-            </div>
-            <h1 className="text-2xl font-black tracking-tight">PREMIA ADMIN</h1>
-            <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
-            {(!supabase.auth) && (
-              <div className="mt-4 p-3 bg-destructive/10 text-destructive text-xs rounded-md border border-destructive/20">
-                Aviso: Supabase não está configurado. Verifique as variáveis de ambiente.
+        <div className="w-full max-w-md space-y-4">
+          <Card className="p-8">
+            <div className="flex flex-col items-center gap-2 mb-8">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+                <LayoutDashboard className="text-primary-foreground" size={24} />
               </div>
-            )}
-          </div>
-          
-          <form onSubmit={handleAuth} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@exemplo.com"
-                required
-              />
+              <h1 className="text-2xl font-black tracking-tight">PREMIA ADMIN</h1>
+              <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
-              {loading ? "CARREGANDO..." : (isRegistering ? "CRIAR CONTA ADMIN" : "ENTRAR NO PAINEL")}
-            </Button>
+            
+            <form onSubmit={handleAuth} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">E-mail</Label>
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@exemplo.com"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input 
+                  id="password" 
+                  type="password" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
+                {loading ? "CARREGANDO..." : (isRegistering ? "CRIAR CONTA ADMIN" : "ENTRAR NO PAINEL")}
+              </Button>
 
-            <button
-              type="button"
-              onClick={() => setIsRegistering(!isRegistering)}
-              className="w-full text-sm text-muted-foreground hover:text-primary transition-colors text-center mt-4"
-            >
-              {isRegistering ? "Já tem uma conta? Entre aqui" : "Não tem uma conta? Crie uma aqui"}
-            </button>
-          </form>
-        </Card>
+              <div className="flex flex-col gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsRegistering(!isRegistering)}
+                  className="w-full text-sm text-muted-foreground hover:text-primary transition-colors text-center"
+                >
+                  {isRegistering ? "Já tem uma conta? Entre aqui" : "Não tem uma conta? Crie uma aqui"}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => setShowDiagnostics(!showDiagnostics)}
+                  className="w-full text-xs text-muted-foreground/60 hover:text-primary transition-colors text-center"
+                >
+                  {showDiagnostics ? "Ocultar Diagnóstico" : "Ver Diagnóstico de Conexão"}
+                </button>
+              </div>
+            </form>
+          </Card>
+
+          {showDiagnostics && (
+            <Card className="p-6 border-destructive/20 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="flex items-center gap-2 mb-4">
+                <Settings className="w-4 h-4 text-primary" />
+                <h3 className="font-bold text-sm">Diagnóstico do Supabase</h3>
+              </div>
+              
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center justify-between text-xs p-2 bg-muted rounded">
+                  <span className="font-medium">URL:</span>
+                  <div className="flex items-center gap-1">
+                    {supabaseConfig.url ? (
+                      <CheckCircle2 className="w-3 h-3 text-green-500" />
+                    ) : (
+                      <AlertCircle className="w-3 h-3 text-destructive" />
+                    )}
+                    <span className={supabaseConfig.url ? "text-green-600" : "text-destructive"}>
+                      {supabaseConfig.url ? "Configurada" : "Ausente"}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between text-xs p-2 bg-muted rounded">
+                  <span className="font-medium">Anon Key:</span>
+                  <div className="flex items-center gap-1">
+                    {supabaseConfig.anonKey ? (
+                      <CheckCircle2 className="w-3 h-3 text-green-500" />
+                    ) : (
+                      <AlertCircle className="w-3 h-3 text-destructive" />
+                    )}
+                    <span className={supabaseConfig.anonKey ? "text-green-600" : "text-destructive"}>
+                      {supabaseConfig.anonKey ? "Configurada" : "Ausente"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full text-xs gap-2"
+                onClick={handleTestConnection}
+                disabled={testingConnection || !isSupabaseConfigured}
+              >
+                {testingConnection ? (
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary"></div>
+                ) : (
+                  <Wifi className="w-3 h-3" />
+                )}
+                {testingConnection ? "Testando..." : "Testar Conexão"}
+              </Button>
+              
+              {!isSupabaseConfigured && (
+                <Alert variant="destructive" className="mt-4 py-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle className="text-xs">Variáveis Faltando</AlertTitle>
+                  <AlertDescription className="text-[10px]">
+                    Adicione VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no Lovable.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </Card>
+          )}
+        </div>
       </div>
     );
   }

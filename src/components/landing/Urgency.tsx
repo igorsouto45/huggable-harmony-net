@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 export const Urgency = () => {
   const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 22, seconds: 54 });
   const [remainingTickets, setRemainingTickets] = useState(87);
+  const totalTickets = 100; // Assuming 100 for percentage calculation
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -13,9 +14,15 @@ export const Urgency = () => {
         if (prev.hours > 0) return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
         return prev;
       });
+
+      // Randomly decrease tickets for urgency effect
+      if (Math.random() > 0.95 && remainingTickets > 5) {
+        setRemainingTickets(prev => prev - 1);
+      }
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [remainingTickets]);
+
 
   return (
     <section className="py-10 bg-primary text-primary-foreground">

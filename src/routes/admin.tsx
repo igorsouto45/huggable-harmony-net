@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,31 +19,111 @@ import {
   TrendingUp, 
   Check, 
   Download,
-  LayoutDashboard
+  LayoutDashboard,
+  CreditCard
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
 function AdminLayout() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState("");
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple demo authentication
-    if (username === "admin" && password === "admin123") {
-      setIsAuthenticated(true);
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast.error(error.message);
     } else {
-      alert("Credenciais inválidas");
+      toast.success("Login realizado com sucesso!");
     }
+    setLoading(false);
   };
 
-  if (!isAuthenticated) {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Sessão encerrada");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted/30">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+        <Card className="w-full max-w-md p-8">
+          <div className="flex flex-col items-center gap-2 mb-8">
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+              <LayoutDashboard className="text-primary-foreground" size={24} />
+            </div>
+            <h1 className="text-2xl font-black tracking-tight">PREMIA ADMIN</h1>
+            <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
+          </div>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@exemplo.com"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input 
+                id="password" 
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
+              {loading ? "CARREGANDO..." : "ENTRAR NO PAINEL"}
+            </Button>
+          </form>
+        </Card>
+      </div>
+    );
+  }
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
         <Card className="w-full max-w-md p-8">

@@ -1,8 +1,14 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 
 export const Hero = () => {
   return (
     <section className="relative bg-primary text-primary-foreground py-12 px-6 overflow-hidden">
+      <div className="absolute top-4 right-6 z-20">
+        <Link to="/admin" className="text-xs opacity-40 hover:opacity-100 transition-opacity flex items-center gap-1">
+          🔐 Painel
+        </Link>
+      </div>
       <div className="container mx-auto relative z-10 flex flex-col items-center text-center">
         <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-in fade-in slide-in-from-top-4 duration-1000">
           PREMIA

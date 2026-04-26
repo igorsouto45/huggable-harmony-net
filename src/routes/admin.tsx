@@ -21,11 +21,16 @@ import {
   Check, 
   Download,
   LayoutDashboard,
-  CreditCard
+  CreditCard,
+  AlertCircle,
+  CheckCircle2,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured, supabaseConfig } from "@/lib/supabase";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,

@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Session } from "@supabase/supabase-js";
 import { 
   Table, 
   TableBody, 
@@ -31,7 +32,8 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminLayout() {
-  const [session, setSession] = useState<any>(null);
+  const navigate = useNavigate();
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -70,7 +72,9 @@ function AdminLayout() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    setSession(null);
     toast.success("Sessão encerrada");
+    navigate({ to: "/" });
   };
 
   if (loading) {

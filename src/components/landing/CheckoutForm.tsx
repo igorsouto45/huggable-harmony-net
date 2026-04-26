@@ -89,12 +89,27 @@ export const CheckoutForm = ({ selectedPackage }: { selectedPackage: RafflePacka
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-base font-bold">Seu Nome Completo</Label>
-              <Input id="name" placeholder="Ex: João Silva" required className="py-6 text-lg" />
+              <Input 
+                id="name" 
+                placeholder="Ex: João Silva" 
+                required 
+                className="py-6 text-lg" 
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="whatsapp" className="text-base font-bold">Seu WhatsApp</Label>
-              <Input id="whatsapp" placeholder="(00) 00000-0000" type="tel" required className="py-6 text-lg" />
+              <Input 
+                id="whatsapp" 
+                placeholder="(00) 00000-0000" 
+                type="tel" 
+                required 
+                className="py-6 text-lg" 
+                value={formData.whatsapp}
+                onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+              />
             </div>
 
             <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 flex items-start gap-3">

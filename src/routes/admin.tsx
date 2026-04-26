@@ -108,22 +108,8 @@ function AdminLayout() {
         
         if (error) {
           if (error.message === "Invalid login credentials") {
-            // Tenta criar o usuário automaticamente se ele não existir
-            toast.info("Credenciais inválidas. Verificando se o usuário existe...");
-            const { error: signUpError } = await supabase.auth.signUp({
-              email,
-              password,
-            });
+            toast.error("E-mail ou senha incorretos.");
 
-            if (signUpError) {
-              if (signUpError.message.includes("already registered")) {
-                toast.error("Senha incorreta para este e-mail.");
-              } else {
-                toast.error(`Erro na conexão com o Supabase: ${signUpError.message}`);
-              }
-            } else {
-              toast.success("Primeiro administrador criado com sucesso! Você já pode entrar.");
-            }
           } else {
             toast.error(`Erro no login: ${error.message}`);
           }

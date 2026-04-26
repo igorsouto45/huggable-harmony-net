@@ -58,11 +58,10 @@ export const PackageSelector = ({ onSelect }: { onSelect: (pkg: any) => void }) 
                   pkg.popular ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : "bg-primary text-primary-foreground"
                 )}
                 onClick={() => {
-                  // In a real app, this would trigger the checkout modal
+                  onSelect(pkg);
                   const checkoutSection = document.getElementById('checkout');
                   if (checkoutSection) {
                     checkoutSection.scrollIntoView({ behavior: 'smooth' });
-                    // Trigger some event to pre-select this package
                   }
                 }}
               >

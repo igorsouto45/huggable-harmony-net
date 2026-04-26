@@ -8,13 +8,7 @@ import { Urgency } from "@/components/landing/Urgency";
 import { CheckoutForm } from "@/components/landing/CheckoutForm";
 import { WhatsAppButton } from "@/components/landing/WhatsAppButton";
 
-export interface RafflePackage {
-  id: number;
-  name: string;
-  tickets: number;
-  price: number;
-  popular: boolean;
-}
+import { type RafflePackage } from "@/lib/types";
 
 export const Route = createFileRoute("/")({
   component: Index,

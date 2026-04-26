@@ -109,6 +109,11 @@ function AdminLayout() {
             </div>
             <h1 className="text-2xl font-black tracking-tight">PREMIA ADMIN</h1>
             <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
+            {(!supabase.auth) && (
+              <div className="mt-4 p-3 bg-destructive/10 text-destructive text-xs rounded-md border border-destructive/20">
+                Aviso: Supabase não está configurado. Verifique as variáveis de ambiente.
+              </div>
+            )}
           </div>
           
           <form onSubmit={handleAuth} className="space-y-4">

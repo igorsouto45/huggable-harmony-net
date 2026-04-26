@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Session } from "@supabase/supabase-js";
 import { 
   Table, 
   TableBody, 
@@ -14,14 +15,23 @@ import { Ticket, History, User, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
+interface UserPurchase {
+  id: string;
+  raffle_name: string;
+  numbers: string[];
+  status: string;
+  date: string;
+}
+
 export const Route = createFileRoute("/account")({
   component: AccountLayout,
 });
 
 function AccountLayout() {
-  const [session, setSession] = useState<any>(null);
+  const navigate = useNavigate();
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [purchases, setPurchases] = useState<any[]>([]);
+  const [purchases, setPurchases] = useState<UserPurchase[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {

@@ -42,7 +42,7 @@ export const Urgency = () => {
               <h3 className="text-lg font-bold">Restam poucos números</h3>
               <span className="text-secondary font-black text-2xl animate-pulse">{remainingTickets}</span>
             </div>
-            <Progress value={remainingTickets} className="h-3 bg-white/20" />
+            <Progress value={(remainingTickets / totalTickets) * 100} className="h-3 bg-white/20" />
             <p className="text-sm opacity-80 text-right font-medium">Corra antes que acabe!</p>
           </div>
         </div>

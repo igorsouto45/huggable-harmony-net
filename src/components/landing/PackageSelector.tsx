@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { type RafflePackage } from "@/routes/index";
+import { type RafflePackage } from "@/lib/types";
 
 const packages: RafflePackage[] = [
   { id: 1, name: "Bronze", tickets: 1, price: 5, popular: false },

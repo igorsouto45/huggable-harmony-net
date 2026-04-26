@@ -103,7 +103,7 @@ export const CheckoutForm = ({ selectedPackage }: { selectedPackage: any }) => {
               className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-black py-8 text-xl rounded-2xl shadow-lg transition-all active:scale-95"
               disabled={loading}
             >
-              {loading ? "PROCESSANDO..." : "👉 PAGAR COM PIX AGORA"}
+              {loading ? "PROCESSANDO..." : selectedPackage ? `👉 PAGAR R$ ${selectedPackage.price} COM PIX` : "👉 ESCOLHA UM PACOTE ACIMA"}
             </Button>
             
             <div className="flex justify-center gap-6 opacity-40 grayscale">

@@ -278,14 +278,15 @@ function AdminLayout() {
     <div className="min-h-screen bg-muted/30 flex flex-col md:flex-row">
       <aside className="w-full md:w-64 bg-primary text-primary-foreground p-6 md:fixed md:h-full">
         <div className="flex items-center gap-2 mb-10">
-          <div className="w-8 h-8 bg-secondary rounded-lg" />
-          <h1 className="text-xl font-black tracking-tight">PREMIA ADMIN</h1>
+          <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center font-black text-secondary-foreground text-xs">PS</div>
+          <h1 className="text-xl font-black tracking-tight">PREMIA SEMPRE</h1>
         </div>
         
         <nav className="space-y-2">
           <NavItem icon={<LayoutDashboard size={20}/>} label="Dashboard" active={activeTab === "dashboard"} onClick={() => setActiveTab("dashboard")} />
           <NavItem icon={<PlusCircle size={20}/>} label="Produtos" active={activeTab === "products"} onClick={() => setActiveTab("products")} />
           <NavItem icon={<Users size={20}/>} label="Participantes" active={activeTab === "users"} onClick={() => setActiveTab("users")} />
+          <NavItem icon={<CreditCard size={20}/>} label="Personalização" active={activeTab === "customization"} onClick={() => setActiveTab("customization")} />
           <NavItem icon={<Settings size={20}/>} label="Configurações" active={activeTab === "settings"} onClick={() => setActiveTab("settings")} />
         </nav>
 
@@ -302,7 +303,9 @@ function AdminLayout() {
 
       <main className="flex-1 md:ml-64 p-8">
         <header className="flex justify-between items-center mb-10">
-          <h2 className="text-3xl font-bold capitalize">{activeTab}</h2>
+          <h2 className="text-3xl font-bold capitalize">
+            {activeTab === "customization" ? "Personalização da Página" : activeTab}
+          </h2>
           <Button className="bg-primary hover:bg-primary/90">
             <Download className="mr-2 h-4 w-4" /> Exportar Dados
           </Button>
@@ -311,6 +314,7 @@ function AdminLayout() {
         {activeTab === "dashboard" && <DashboardView />}
         {activeTab === "products" && <ProductsView />}
         {activeTab === "users" && <UsersView />}
+        {activeTab === "customization" && <CustomizationView />}
         {activeTab === "settings" && <SettingsView />}
       </main>
     </div>

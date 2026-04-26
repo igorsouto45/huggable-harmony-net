@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { Hero } from "@/components/landing/Hero";
 import { PackageSelector } from "@/components/landing/PackageSelector";
 import { ProductDetails } from "@/components/landing/ProductDetails";
@@ -12,6 +13,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const [selectedPackage, setSelectedPackage] = useState<any>(null);
+
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-secondary selection:text-secondary-foreground">
       {/* WhatsApp Floating Button */}
@@ -25,7 +28,7 @@ function Index() {
         <Urgency />
 
         {/* 2. Buy Block (Package Selection) */}
-        <PackageSelector />
+        <PackageSelector onSelect={setSelectedPackage} />
 
         {/* 3. Product Details */}
         <ProductDetails />
@@ -34,7 +37,7 @@ function Index() {
         <Winners />
 
         {/* 6. Checkout Section */}
-        <CheckoutForm />
+        <CheckoutForm selectedPackage={selectedPackage} />
       </main>
 
       <footer className="py-12 px-6 bg-primary text-primary-foreground border-t border-white/10">

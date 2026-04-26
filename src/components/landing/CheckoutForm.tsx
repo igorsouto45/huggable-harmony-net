@@ -43,8 +43,8 @@ export const CheckoutForm = ({ selectedPackage }: { selectedPackage: any }) => {
             <h2 className="text-3xl font-black mb-4">Pedido Reservado!</h2>
             <p className="text-lg mb-4 text-muted-foreground">
               Seus números reservados: <br/>
-              <span className="text-primary font-black text-2xl tracking-widest">
-                452, 891, 102, 334, 056...
+              <span className="text-primary font-black text-2xl tracking-widest break-all">
+                {assignedNumbers.join(", ")}
               </span>
             </p>
             <p className="text-base mb-8 text-muted-foreground">

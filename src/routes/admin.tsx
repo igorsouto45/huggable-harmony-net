@@ -44,8 +44,14 @@ function AdminLayout() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [testingConnection, setTestingConnection] = useState(false);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setShowDiagnostics(true);
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
@@ -60,33 +66,76 @@ function AdminLayout() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const handleTestConnection = async () => {
+    setTestingConnection(true);
+    try {
+      const { data, error } = await supabase.from('products').select('count', { count: 'exact', head: true });
+      if (error) throw error;
+      toast.success("Conexão com Supabase estabelecida com sucesso!");
+    } catch (error: any) {
+      console.error("Connection test failed:", error);
+      toast.error(`Falha na conexão: ${error.message || "Erro desconhecido"}`);
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    if (isRegistering) {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-      if (error) {
-        toast.error(error.message);
+    try {
+      if (isRegistering) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) {
+          if (error.message.includes("User already registered")) {
+            toast.error("Este e-mail já está cadastrado.");
+          } else {
+            toast.error(`Erro ao criar conta: ${error.message}`);
+          }
+        } else {
+          toast.success("Conta de administrador criada com sucesso! Verifique seu e-mail se necessário.");
+          setIsRegistering(false);
+        }
       } else {
-        toast.success("Conta criada com sucesso! Você já pode entrar.");
-        setIsRegistering(false);
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error) {
+          if (error.message === "Invalid login credentials") {
+            // Tenta criar o usuário automaticamente se ele não existir
+            toast.info("Credenciais inválidas. Verificando se o usuário existe...");
+            const { error: signUpError } = await supabase.auth.signUp({
+              email,
+              password,
+            });
+
+            if (signUpError) {
+              if (signUpError.message.includes("already registered")) {
+                toast.error("Senha incorreta para este e-mail.");
+              } else {
+                toast.error(`Erro na conexão com o Supabase: ${signUpError.message}`);
+              }
+            } else {
+              toast.success("Primeiro administrador criado com sucesso! Você já pode entrar.");
+            }
+          } else {
+            toast.error(`Erro no login: ${error.message}`);
+          }
+        } else {
+          toast.success("Login realizado com sucesso!");
+        }
       }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) {
-        toast.error(error.message);
-      } else {
-        toast.success("Login realizado com sucesso!");
-      }
+    } catch (err: any) {
+      toast.error("Ocorreu um erro inesperado na comunicação com o servidor.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleLogout = async () => {

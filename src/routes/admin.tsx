@@ -35,6 +35,7 @@ function AdminLayout() {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -54,18 +55,31 @@ function AdminLayout() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      toast.error(error.message);
+    
+    if (isRegistering) {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Conta criada com sucesso! Você já pode entrar.");
+        setIsRegistering(false);
+      }
     } else {
-      toast.success("Login realizado com sucesso!");
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Login realizado com sucesso!");
+      }
     }
     setLoading(false);
   };

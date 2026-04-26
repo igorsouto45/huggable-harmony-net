@@ -9,12 +9,11 @@ import { CheckoutForm } from "@/components/landing/CheckoutForm";
 import { WhatsAppButton } from "@/components/landing/WhatsAppButton";
 
 export interface RafflePackage {
-  id: string;
+  id: number;
   name: string;
   tickets: number;
-  price: string;
-  badge?: string;
-  isPopular?: boolean;
+  price: number;
+  popular: boolean;
 }
 
 export const Route = createFileRoute("/")({

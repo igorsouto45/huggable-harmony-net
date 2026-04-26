@@ -72,7 +72,9 @@ function AdminLayout() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    setSession(null);
     toast.success("Sessão encerrada");
+    navigate({ to: "/" });
   };
 
   if (loading) {

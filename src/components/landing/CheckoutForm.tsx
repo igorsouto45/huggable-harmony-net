@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ShieldCheck, Smartphone, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { generateRandomNumbers } from "@/lib/raffle";
-import { type RafflePackage } from "@/routes/index";
+import { type RafflePackage } from "@/lib/types";
 
 export const CheckoutForm = ({ selectedPackage }: { selectedPackage: RafflePackage | null }) => {
   const [loading, setLoading] = useState(false);

@@ -94,20 +94,6 @@ function AdminLayout() {
     setLoading(true);
     
     try {
-      // Demo account bypass for development/testing
-      if (email === "admin@exemplo.com" && password === "admin123") {
-        setSession({
-          user: { email: "admin@exemplo.com", id: "demo-admin" },
-          access_token: "demo",
-          refresh_token: "demo",
-          expires_in: 3600,
-          token_type: "bearer"
-        } as any);
-        toast.success("Acesso administrativo (Modo Demonstração)");
-        setLoading(false);
-        return;
-      }
-
       if (isRegistering) {
         const { error } = await supabase.auth.signUp({
           email,
@@ -124,7 +110,7 @@ function AdminLayout() {
           setIsRegistering(false);
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -135,8 +121,21 @@ function AdminLayout() {
           } else {
             toast.error(`Erro no login: ${error.message}`);
           }
-        } else {
-          toast.success("Login realizado com sucesso!");
+        } else if (data.user) {
+          // Check if user is admin in the profiles table
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', data.user.id)
+            .single();
+
+          if (profileError || !profile?.is_admin) {
+            await supabase.auth.signOut();
+            toast.error("Acesso negado. Você não tem permissão de administrador.");
+            setSession(null);
+          } else {
+            toast.success("Login realizado com sucesso!");
+          }
         }
       }
     } catch (err: any) {

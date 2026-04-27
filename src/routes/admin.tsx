@@ -299,6 +299,7 @@ function AdminLayout() {
           <NavItem icon={<Users size={20}/>} label="Participantes" active={activeTab === "users"} onClick={() => setActiveTab("users")} />
           <NavItem icon={<CreditCard size={20}/>} label="Personalização" active={activeTab === "customization"} onClick={() => setActiveTab("customization")} />
           <NavItem icon={<Settings size={20}/>} label="Configurações" active={activeTab === "settings"} onClick={() => setActiveTab("settings")} />
+          <NavItem icon={<Users size={20}/>} label="Administradores" active={activeTab === "admins"} onClick={() => setActiveTab("admins")} />
         </nav>
 
         <div className="absolute bottom-8 left-6 right-6">

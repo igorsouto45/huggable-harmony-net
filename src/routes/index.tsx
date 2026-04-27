@@ -55,10 +55,10 @@ function Index() {
             Plataforma digital de sorteios autorizados. Participe com responsabilidade.
             Todos os direitos reservados &copy; {new Date().getFullYear()}
           </p>
-          <div className="flex justify-center gap-6 text-sm font-bold opacity-80">
-            <a href="#" className="hover:text-secondary transition-colors">Regras do Sorteio</a>
-            <a href="#" className="hover:text-secondary transition-colors">Termos de Uso</a>
-            <a href="#" className="hover:text-secondary transition-colors">Privacidade</a>
+          <div className="flex justify-center gap-6 text-sm font-bold opacity-80 flex-wrap">
+            <Link to="/p/$slug" params={{ slug: "regras" }} className="hover:text-secondary transition-colors">Regras do Sorteio</Link>
+            <Link to="/p/$slug" params={{ slug: "termos" }} className="hover:text-secondary transition-colors">Termos de Uso</Link>
+            <Link to="/p/$slug" params={{ slug: "privacidade" }} className="hover:text-secondary transition-colors">Privacidade</Link>
           </div>
           <div className="pt-6 border-t border-white/5 opacity-50 text-[10px] uppercase tracking-widest">
             Desenvolvido com foco total em conversão

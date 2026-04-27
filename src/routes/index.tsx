@@ -24,6 +24,8 @@ function Index() {
       {/* WhatsApp Floating Button */}
       <WhatsAppButton />
 
+      <Header />
+
       <main>
         {/* 1. Hero Section */}
         <Hero />

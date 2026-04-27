@@ -630,7 +630,81 @@ function SettingsView() {
           </Button>
         </div>
       </Card>
+
+      <ContentEditor contentKey="rules" label="Regras do Sorteio" />
+      <ContentEditor contentKey="terms" label="Termos de Uso" />
+      <ContentEditor contentKey="privacy" label="Política de Privacidade" />
     </div>
+  );
+}
+
+function ContentEditor({ contentKey, label }: { contentKey: string; label: string }) {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .from("site_content")
+      .select("*")
+      .eq("key", contentKey)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setTitle(data.title);
+          setContent(data.content);
+        }
+        setLoading(false);
+      });
+  }, [contentKey]);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    const { error } = await supabase
+      .from("site_content")
+      .update({ title, content })
+      .eq("key", contentKey);
+
+    if (error) {
+      toast.error(`Erro ao salvar: ${error.message}`);
+    } else {
+      toast.success(`${label} salvo com sucesso!`);
+    }
+    setSaving(false);
+  };
+
+  return (
+    <Card className="p-8">
+      <h3 className="text-xl font-bold mb-2">{label}</h3>
+      <p className="text-xs text-muted-foreground mb-6">
+        Suporta Markdown básico: # Título, ## Subtítulo, **negrito**, listas com - ou 1.
+      </p>
+      {loading ? (
+        <p className="text-sm text-muted-foreground">Carregando...</p>
+      ) : (
+        <form onSubmit={handleSave} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Título da Página</Label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </div>
+          <div className="space-y-2">
+            <Label>Conteúdo (Markdown)</Label>
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={14}
+              className="font-mono text-xs"
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full font-bold" disabled={saving}>
+            {saving ? "Salvando..." : `SALVAR ${label.toUpperCase()}`}
+          </Button>
+        </form>
+      )}
+    </Card>
   );
 }
 

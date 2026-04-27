@@ -208,14 +208,6 @@ function AdminLayout() {
               <div className="flex flex-col gap-2 mt-4">
                 <button
                   type="button"
-                  onClick={() => setIsRegistering(!isRegistering)}
-                  className="w-full text-sm text-muted-foreground hover:text-primary transition-colors text-center"
-                >
-                  {isRegistering ? "Já tem uma conta? Entre aqui" : "Não tem uma conta? Crie uma aqui"}
-                </button>
-                
-                <button
-                  type="button"
                   onClick={() => setShowDiagnostics(!showDiagnostics)}
                   className="w-full text-xs text-muted-foreground/60 hover:text-primary transition-colors text-center"
                 >

@@ -200,12 +200,10 @@ function AdminLayout() {
                 {loading ? "CARREGANDO..." : (isRegistering ? "CRIAR CONTA ADMIN" : "ENTRAR NO PAINEL")}
               </Button>
               
-              {!isRegistering && (
-                <div className="p-3 bg-secondary/10 rounded-lg border border-secondary/20 text-xs text-center space-y-1">
-                  <p className="font-bold text-secondary-foreground">Acesso de Demonstração:</p>
-                  <p className="text-muted-foreground italic">Usuário: admin@exemplo.com | Senha: admin123</p>
-                </div>
-              )}
+              <div className="p-3 bg-secondary/10 rounded-lg border border-secondary/20 text-xs text-center space-y-1">
+                <p className="font-bold text-secondary-foreground">Aviso:</p>
+                <p className="text-muted-foreground">O acesso agora requer um usuário administrador cadastrado no banco de dados.</p>
+              </div>
 
               <div className="flex flex-col gap-2 mt-4">
                 <button

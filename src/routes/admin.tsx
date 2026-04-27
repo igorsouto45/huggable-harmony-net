@@ -180,7 +180,7 @@ function AdminLayout() {
                 />
               </div>
               <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
-                {loading ? "CARREGANDO..." : (isRegistering ? "CRIAR CONTA ADMIN" : "ENTRAR NO PAINEL")}
+                {loading ? "CARREGANDO..." : "ENTRAR NO PAINEL"}
               </Button>
               
               <div className="p-3 bg-secondary/10 rounded-lg border border-secondary/20 text-xs text-center space-y-1">

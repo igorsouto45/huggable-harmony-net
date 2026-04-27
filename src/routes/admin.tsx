@@ -78,7 +78,7 @@ function AdminLayout() {
   const handleTestConnection = async () => {
     setTestingConnection(true);
     try {
-      const { data, error } = await supabase.from('products').select('count', { count: 'exact', head: true });
+      const { data, error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
       if (error) throw error;
       toast.success("Conexão com Supabase estabelecida com sucesso!");
     } catch (error: any) {

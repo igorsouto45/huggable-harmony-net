@@ -86,45 +86,7 @@ function AccountLayout() {
   }
 
   if (!session) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 p-4">
-        <Card className="w-full max-w-md p-8">
-          <div className="text-center mb-8">
-            <User className="mx-auto mb-4 text-primary" size={48} />
-            <h1 className="text-2xl font-bold mb-2">Área do Cliente</h1>
-            <p className="text-muted-foreground">Entre com seus dados para ver seus números</p>
-          </div>
-          
-          <form onSubmit={async (e) => {
-            e.preventDefault();
-            const email = (e.currentTarget.elements.namedItem("email") as HTMLInputElement).value;
-            const password = (e.currentTarget.elements.namedItem("password") as HTMLInputElement).value;
-            
-            setLoading(true);
-            const { error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) {
-              toast.error("Credenciais inválidas ou conta não encontrada.");
-            } else {
-              toast.success("Bem-vindo de volta!");
-            }
-            setLoading(false);
-          }} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-bold">E-mail</label>
-              <input name="email" type="email" required className="w-full p-3 rounded-lg border bg-background" placeholder="seu@email.com" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-bold">Senha</label>
-              <input name="password" type="password" required className="w-full p-3 rounded-lg border bg-background" placeholder="••••••••" />
-            </div>
-            <Button type="submit" className="w-full font-bold py-6" disabled={loading}>
-              {loading ? "CARREGANDO..." : "ENTRAR"}
-            </Button>
-            <Button variant="ghost" onClick={() => navigate({ to: "/" })} className="w-full">VOLTAR PARA O INÍCIO</Button>
-          </form>
-        </Card>
-      </div>
-    );
+    return <AuthForm onBack={() => navigate({ to: "/" })} />;
   }
 
 
@@ -185,6 +147,148 @@ function AccountLayout() {
           </Card>
         </div>
       </div>
+    </div>
+  );
+}
+
+function AuthForm({ onBack }: { onBack: () => void }) {
+  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (mode === "login") {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          toast.error("E-mail ou senha incorretos.");
+        } else {
+          toast.success("Bem-vindo de volta!");
+        }
+      } else {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/account`,
+            data: { full_name: name, whatsapp },
+          },
+        });
+        if (error) {
+          toast.error(`Erro ao cadastrar: ${error.message}`);
+        } else if (data.user && !data.session) {
+          toast.success("Cadastro realizado! Verifique seu e-mail para confirmar a conta.");
+        } else {
+          toast.success("Cadastro realizado com sucesso!");
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 p-4">
+      <Card className="w-full max-w-md p-8">
+        <div className="text-center mb-8">
+          <User className="mx-auto mb-4 text-primary" size={48} />
+          <h1 className="text-2xl font-bold mb-2">
+            {mode === "login" ? "Área do Cliente" : "Criar sua conta"}
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            {mode === "login"
+              ? "Entre para ver seus números e compras"
+              : "Cadastre-se para participar dos sorteios"}
+          </p>
+        </div>
+
+        <div className="flex bg-muted rounded-lg p-1 mb-6">
+          <button
+            type="button"
+            onClick={() => setMode("login")}
+            className={`flex-1 py-2 rounded-md font-bold text-sm transition-colors ${
+              mode === "login" ? "bg-background shadow-sm" : "text-muted-foreground"
+            }`}
+          >
+            ENTRAR
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("signup")}
+            className={`flex-1 py-2 rounded-md font-bold text-sm transition-colors ${
+              mode === "signup" ? "bg-background shadow-sm" : "text-muted-foreground"
+            }`}
+          >
+            CRIAR CONTA
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {mode === "signup" && (
+            <>
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Nome completo</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="w-full p-3 rounded-lg border bg-background"
+                  placeholder="Seu nome"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold">WhatsApp</label>
+                <input
+                  type="tel"
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  required
+                  className="w-full p-3 rounded-lg border bg-background"
+                  placeholder="(11) 99999-9999"
+                />
+              </div>
+            </>
+          )}
+          <div className="space-y-2">
+            <label className="text-sm font-bold">E-mail</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full p-3 rounded-lg border bg-background"
+              placeholder="seu@email.com"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-bold">Senha</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="w-full p-3 rounded-lg border bg-background"
+              placeholder="••••••••"
+            />
+            {mode === "signup" && (
+              <p className="text-xs text-muted-foreground">Mínimo 6 caracteres</p>
+            )}
+          </div>
+          <Button type="submit" className="w-full font-bold py-6" disabled={loading}>
+            {loading ? "CARREGANDO..." : mode === "login" ? "ENTRAR" : "CRIAR CONTA"}
+          </Button>
+          <Button type="button" variant="ghost" onClick={onBack} className="w-full">
+            VOLTAR PARA O INÍCIO
+          </Button>
+        </form>
+      </Card>
     </div>
   );
 }

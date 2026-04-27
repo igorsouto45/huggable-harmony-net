@@ -21,13 +21,13 @@ if (SUPABASE_URL && SUPABASE_KEY) {
         console.log('[Supabase] ✅ Conexão estabelecida com sucesso')
         console.log('[Supabase] Sessão atual:', data.session ? `usuário ${data.session.user.email}` : 'nenhum usuário logado')
         
-        // Testar acesso ao banco de dados se houver uma tabela 'products'
-        supabase.from('products').select('id').limit(1)
+        // Testar acesso ao banco de dados usando a tabela 'profiles' que sabemos que existe
+        supabase.from('profiles').select('id').limit(1)
           .then(({ error: dbError }) => {
             if (dbError) {
               console.warn('[Supabase] ⚠️ Alerta de banco de dados:', dbError.message)
             } else {
-              console.log('[Supabase] ✅ Acesso ao banco de dados OK')
+              console.log('[Supabase] ✅ Acesso ao banco de dados OK (profiles)')
             }
           })
       }

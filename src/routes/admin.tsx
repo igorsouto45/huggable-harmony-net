@@ -94,48 +94,31 @@ function AdminLayout() {
     setLoading(true);
     
     try {
-      if (isRegistering) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (error) {
-          if (error.message.includes("User already registered")) {
-            toast.error("Este e-mail já está cadastrado.");
-          } else {
-            toast.error(`Erro ao criar conta: ${error.message}`);
-          }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        if (error.message === "Invalid login credentials") {
+          toast.error("E-mail ou senha incorretos.");
         } else {
-          toast.success("Conta de administrador criada com sucesso! Verifique seu e-mail se necessário.");
-          setIsRegistering(false);
+          toast.error(`Erro no login: ${error.message}`);
         }
-      } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (error) {
-          if (error.message === "Invalid login credentials") {
-            toast.error("E-mail ou senha incorretos.");
-          } else {
-            toast.error(`Erro no login: ${error.message}`);
-          }
-        } else if (data.user) {
-          // Check if user is admin in the profiles table
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('is_admin')
-            .eq('id', data.user.id)
-            .single();
+      } else if (data.user) {
+        // Check if user is admin in the profiles table
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', data.user.id)
+          .single();
 
-          if (profileError || !profile?.is_admin) {
-            await supabase.auth.signOut();
-            toast.error("Acesso negado. Você não tem permissão de administrador.");
-            setSession(null);
-          } else {
-            toast.success("Login realizado com sucesso!");
-          }
+        if (profileError || !profile?.is_admin) {
+          await supabase.auth.signOut();
+          toast.error("Acesso negado. Você não tem permissão de administrador.");
+          setSession(null);
+        } else {
+          toast.success("Login realizado com sucesso!");
         }
       }
     } catch (err: any) {

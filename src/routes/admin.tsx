@@ -25,7 +25,10 @@ import {
   AlertCircle,
   CheckCircle2,
   Wifi,
-  WifiOff
+  WifiOff,
+  Image,
+  Star,
+  Type
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase, isSupabaseConfigured, supabaseConfig } from "@/lib/supabase";
@@ -544,6 +547,10 @@ function CustomizationView() {
     whatsappNumber: "5511999999999",
     primaryColor: "#000000",
     secondaryColor: "#EAB308",
+    featuredTitle: "Destaque do Dia",
+    featuredDescription: "Confira o prêmio principal de hoje e garanta sua participação!",
+    featuredImages: ["", "", ""],
+    searchPlaceholder: "Buscar sorteio...",
   });
 
   const handleSave = (e: React.FormEvent) => {
@@ -603,6 +610,77 @@ function CustomizationView() {
           <div className="md:col-span-2">
             <Button type="submit" className="w-full py-6 font-bold">SALVAR ALTERAÇÕES</Button>
           </div>
+        </form>
+      </Card>
+      
+      <Card className="p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <Star className="text-secondary fill-secondary" size={24} />
+          <h3 className="text-xl font-bold">Destaque do Dia</h3>
+        </div>
+        
+        <form onSubmit={handleSave} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label>Título do Destaque</Label>
+              <Input 
+                value={settings.featuredTitle} 
+                onChange={e => setSettings({...settings, featuredTitle: e.target.value})}
+                placeholder="Ex: Destaque do Dia"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Placeholder de Busca</Label>
+              <Input 
+                value={settings.searchPlaceholder} 
+                onChange={e => setSettings({...settings, searchPlaceholder: e.target.value})}
+                placeholder="Ex: Buscar sorteio..."
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>Descrição do Destaque</Label>
+            <Input 
+              value={settings.featuredDescription} 
+              onChange={e => setSettings({...settings, featuredDescription: e.target.value})}
+              placeholder="Descreva o destaque..."
+            />
+          </div>
+
+          <div className="space-y-4">
+            <Label className="flex items-center gap-2">
+              <Image size={16} /> Fotos do Carrossel (Até 3)
+            </Label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[0, 1, 2].map((idx) => (
+                <div key={idx} className="space-y-2 p-4 bg-muted/50 rounded-lg border border-dashed">
+                  <Label className="text-xs">Foto {idx + 1}</Label>
+                  <div className="aspect-video bg-muted rounded-md mb-2 overflow-hidden flex items-center justify-center border">
+                    {settings.featuredImages[idx] ? (
+                      <img src={settings.featuredImages[idx]} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                    ) : (
+                      <Image className="text-muted-foreground opacity-20" size={32} />
+                    )}
+                  </div>
+                  <Input 
+                    placeholder="URL da imagem..." 
+                    className="text-xs"
+                    value={settings.featuredImages[idx]}
+                    onChange={(e) => {
+                      const newImages = [...settings.featuredImages];
+                      newImages[idx] = e.target.value;
+                      setSettings({...settings, featuredImages: newImages});
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Button type="submit" className="w-full py-6 font-bold bg-secondary text-secondary-foreground hover:bg-secondary/90">
+            SALVAR CONFIGURAÇÕES DE DESTAQUE
+          </Button>
         </form>
       </Card>
 

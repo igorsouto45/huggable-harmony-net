@@ -4,12 +4,7 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type RafflePackage } from "@/lib/types";
 
-const packages: RafflePackage[] = [
-  { id: 1, name: "Bronze", tickets: 1, price: 5, popular: false },
-  { id: 2, name: "Prata", tickets: 5, price: 10, popular: false },
-  { id: 3, name: "Ouro", tickets: 15, price: 15, popular: false },
-  { id: 4, name: "Diamante", tickets: 30, price: 20, popular: true },
-];
+const packages: RafflePackage[] = [];
 
 export const PackageSelector = ({ onSelect }: { onSelect: (pkg: RafflePackage) => void }) => {
   return (

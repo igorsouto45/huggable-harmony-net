@@ -5,15 +5,7 @@ import { Logo } from "@/components/Logo";
 export const Hero = () => {
   return (
     <section className="relative bg-primary text-primary-foreground py-12 px-6 overflow-hidden">
-      <div className="absolute top-4 right-6 z-20">
-        <Link to="/admin" className="text-xs opacity-40 hover:opacity-100 transition-opacity flex items-center gap-1">
-          🔐 Painel
-        </Link>
-      </div>
       <div className="container mx-auto relative z-10 flex flex-col items-center text-center">
-        <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-1000 scale-125 md:scale-150">
-          <Logo />
-        </div>
         <h2 className="text-2xl md:text-4xl font-extrabold mb-2 tracking-tight">
           Ganhe produtos desejados pagando pouco
         </h2>

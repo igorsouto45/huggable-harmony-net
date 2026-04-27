@@ -328,6 +328,7 @@ function AdminLayout() {
         {activeTab === "users" && <UsersView />}
         {activeTab === "customization" && <CustomizationView />}
         {activeTab === "settings" && <SettingsView />}
+        {activeTab === "admins" && <AdminsView />}
       </main>
     </div>
   );

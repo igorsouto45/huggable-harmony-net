@@ -11,7 +11,6 @@ const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
 console.log('[Supabase] VITE_SUPABASE_URL:', SUPABASE_URL ? '✅ definida' : '❌ ausente')
 console.log('[Supabase] VITE_SUPABASE_PUBLISHABLE_KEY:', SUPABASE_KEY ? '✅ definida' : '❌ ausente')
-console.log('[Supabase] URL:', SUPABASE_URL)
 
 if (SUPABASE_URL && SUPABASE_KEY) {
   supabase.auth.getSession()
@@ -21,13 +20,23 @@ if (SUPABASE_URL && SUPABASE_KEY) {
       } else {
         console.log('[Supabase] ✅ Conexão estabelecida com sucesso')
         console.log('[Supabase] Sessão atual:', data.session ? `usuário ${data.session.user.email}` : 'nenhum usuário logado')
+        
+        // Testar acesso ao banco de dados se houver uma tabela 'products'
+        supabase.from('products').select('id').limit(1)
+          .then(({ error: dbError }) => {
+            if (dbError) {
+              console.warn('[Supabase] ⚠️ Alerta de banco de dados:', dbError.message)
+            } else {
+              console.log('[Supabase] ✅ Acesso ao banco de dados OK')
+            }
+          })
       }
     })
     .catch((err) => {
-      console.error('[Supabase] ❌ Falha na conexão:', err)
+      console.error('[Supabase] ❌ Falha técnica na conexão:', err)
     })
 } else {
-  console.error('[Supabase] ❌ Variáveis de ambiente ausentes — conexão não inicializada')
+  console.error('[Supabase] ❌ Variáveis de ambiente ausentes')
 }
 
 const router = getRouter()

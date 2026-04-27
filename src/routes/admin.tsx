@@ -52,10 +52,16 @@ function AdminLayout() {
       setShowDiagnostics(true);
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        setSession(session);
+      })
+      .catch((err) => {
+        console.error("Error fetching session:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     const {
       data: { subscription },
@@ -85,6 +91,20 @@ function AdminLayout() {
     setLoading(true);
     
     try {
+      // Demo account bypass for development/testing
+      if (email === "admin@exemplo.com" && password === "admin123") {
+        setSession({
+          user: { email: "admin@exemplo.com", id: "demo-admin" },
+          access_token: "demo",
+          refresh_token: "demo",
+          expires_in: 3600,
+          token_type: "bearer"
+        } as any);
+        toast.success("Acesso administrativo (Modo Demonstração)");
+        setLoading(false);
+        return;
+      }
+
       if (isRegistering) {
         const { error } = await supabase.auth.signUp({
           email,
@@ -109,7 +129,6 @@ function AdminLayout() {
         if (error) {
           if (error.message === "Invalid login credentials") {
             toast.error("E-mail ou senha incorretos.");
-
           } else {
             toast.error(`Erro no login: ${error.message}`);
           }

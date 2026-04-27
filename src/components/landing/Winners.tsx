@@ -2,12 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trophy } from "lucide-react";
 
-const winners = [
-  { id: 1, name: "Juliana Silva", prize: "iPhone 15 Pro", date: "Há 2 dias", avatar: "JS" },
-  { id: 2, name: "Marcos Oliveira", prize: "PlayStation 5", date: "Há 5 dias", avatar: "MO" },
-  { id: 3, name: "Beatriz Santos", prize: "R$ 1.000,00 no PIX", date: "Há 1 semana", avatar: "BS" },
-  { id: 4, name: "Ricardo Lima", prize: "Apple Watch S9", date: "Há 2 semanas", avatar: "RL" },
-];
+const winners: any[] = [];
 
 export const Winners = () => {
   return (

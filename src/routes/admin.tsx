@@ -94,48 +94,31 @@ function AdminLayout() {
     setLoading(true);
     
     try {
-      if (isRegistering) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (error) {
-          if (error.message.includes("User already registered")) {
-            toast.error("Este e-mail já está cadastrado.");
-          } else {
-            toast.error(`Erro ao criar conta: ${error.message}`);
-          }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        if (error.message === "Invalid login credentials") {
+          toast.error("E-mail ou senha incorretos.");
         } else {
-          toast.success("Conta de administrador criada com sucesso! Verifique seu e-mail se necessário.");
-          setIsRegistering(false);
+          toast.error(`Erro no login: ${error.message}`);
         }
-      } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (error) {
-          if (error.message === "Invalid login credentials") {
-            toast.error("E-mail ou senha incorretos.");
-          } else {
-            toast.error(`Erro no login: ${error.message}`);
-          }
-        } else if (data.user) {
-          // Check if user is admin in the profiles table
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('is_admin')
-            .eq('id', data.user.id)
-            .single();
+      } else if (data.user) {
+        // Check if user is admin in the profiles table
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', data.user.id)
+          .single();
 
-          if (profileError || !profile?.is_admin) {
-            await supabase.auth.signOut();
-            toast.error("Acesso negado. Você não tem permissão de administrador.");
-            setSession(null);
-          } else {
-            toast.success("Login realizado com sucesso!");
-          }
+        if (profileError || !profile?.is_admin) {
+          await supabase.auth.signOut();
+          toast.error("Acesso negado. Você não tem permissão de administrador.");
+          setSession(null);
+        } else {
+          toast.success("Login realizado com sucesso!");
         }
       }
     } catch (err: any) {
@@ -197,7 +180,7 @@ function AdminLayout() {
                 />
               </div>
               <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
-                {loading ? "CARREGANDO..." : (isRegistering ? "CRIAR CONTA ADMIN" : "ENTRAR NO PAINEL")}
+                {loading ? "CARREGANDO..." : "ENTRAR NO PAINEL"}
               </Button>
               
               <div className="p-3 bg-secondary/10 rounded-lg border border-secondary/20 text-xs text-center space-y-1">
@@ -206,14 +189,6 @@ function AdminLayout() {
               </div>
 
               <div className="flex flex-col gap-2 mt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsRegistering(!isRegistering)}
-                  className="w-full text-sm text-muted-foreground hover:text-primary transition-colors text-center"
-                >
-                  {isRegistering ? "Já tem uma conta? Entre aqui" : "Não tem uma conta? Crie uma aqui"}
-                </button>
-                
                 <button
                   type="button"
                   onClick={() => setShowDiagnostics(!showDiagnostics)}
@@ -307,6 +282,7 @@ function AdminLayout() {
           <NavItem icon={<Users size={20}/>} label="Participantes" active={activeTab === "users"} onClick={() => setActiveTab("users")} />
           <NavItem icon={<CreditCard size={20}/>} label="Personalização" active={activeTab === "customization"} onClick={() => setActiveTab("customization")} />
           <NavItem icon={<Settings size={20}/>} label="Configurações" active={activeTab === "settings"} onClick={() => setActiveTab("settings")} />
+          <NavItem icon={<Users size={20}/>} label="Administradores" active={activeTab === "admins"} onClick={() => setActiveTab("admins")} />
         </nav>
 
         <div className="absolute bottom-8 left-6 right-6">
@@ -335,6 +311,7 @@ function AdminLayout() {
         {activeTab === "users" && <UsersView />}
         {activeTab === "customization" && <CustomizationView />}
         {activeTab === "settings" && <SettingsView />}
+        {activeTab === "admins" && <AdminsView />}
       </main>
     </div>
   );
@@ -451,6 +428,126 @@ function UsersView() {
         </TableBody>
       </Table>
     </Card>
+  );
+}
+
+function AdminsView() {
+  const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [newAdminPassword, setNewAdminPassword] = useState("");
+  const [admins, setAdmins] = useState<any[]>([]);
+  const [loadingAdmins, setLoadingAdmins] = useState(true);
+
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+
+  const fetchAdmins = async () => {
+    setLoadingAdmins(true);
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('is_admin', true);
+    
+    if (!error) {
+      setAdmins(data || []);
+    }
+    setLoadingAdmins(false);
+  };
+
+  const handleCreateAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { data, error } = await supabase.auth.signUp({
+      email: newAdminEmail,
+      password: newAdminPassword,
+    });
+
+    if (error) {
+      toast.error(`Erro ao criar administrador: ${error.message}`);
+    } else if (data.user) {
+      // O trigger já cria o profile como is_admin=false, precisamos atualizar para true
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ is_admin: true })
+        .eq('id', data.user.id);
+      
+      if (updateError) {
+        toast.error(`Erro ao dar permissões de admin: ${updateError.message}`);
+      } else {
+        toast.success("Novo administrador criado com sucesso!");
+        setNewAdminEmail("");
+        setNewAdminPassword("");
+        fetchAdmins();
+      }
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      <Card className="p-8">
+        <h3 className="text-xl font-bold mb-6">Cadastrar Novo Administrador</h3>
+        <form onSubmit={handleCreateAdmin} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="admin_email">E-mail</Label>
+            <Input 
+              id="admin_email" 
+              type="email" 
+              value={newAdminEmail} 
+              onChange={(e) => setNewAdminEmail(e.target.value)} 
+              placeholder="email@exemplo.com" 
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="admin_password">Senha</Label>
+            <Input 
+              id="admin_password" 
+              type="password" 
+              value={newAdminPassword} 
+              onChange={(e) => setNewAdminPassword(e.target.value)} 
+              placeholder="••••••••" 
+              required
+            />
+          </div>
+          <div className="md:col-span-2">
+            <Button type="submit" className="w-full py-6 font-bold text-lg">CRIAR CONTA ADMIN</Button>
+          </div>
+        </form>
+      </Card>
+
+      <Card className="p-6">
+        <h3 className="text-xl font-bold mb-6">Administradores do Sistema</h3>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>E-mail</TableHead>
+              <TableHead>Data de Criação</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loadingAdmins ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center py-4">Carregando...</TableCell>
+              </TableRow>
+            ) : admins.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center py-4">Nenhum administrador encontrado.</TableCell>
+              </TableRow>
+            ) : (
+              admins.map((admin) => (
+                <TableRow key={admin.id}>
+                  <TableCell className="font-medium">{admin.email}</TableCell>
+                  <TableCell>{new Date(admin.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold uppercase">Ativo</span>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+    </div>
   );
 }
 

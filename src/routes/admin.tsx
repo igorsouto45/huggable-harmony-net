@@ -188,47 +188,57 @@ function AdminLayout() {
             </div>
             {!session ? (
               <form onSubmit={handleAuth} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@exemplo.com"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
-                {loading ? "CARREGANDO..." : "ENTRAR NO PAINEL"}
-              </Button>
-              
-              <div className="p-3 bg-secondary/10 rounded-lg border border-secondary/20 text-xs text-center space-y-1">
-                <p className="font-bold text-secondary-foreground">Aviso:</p>
-                <p className="text-muted-foreground">O acesso agora requer um usuário administrador cadastrado no banco de dados.</p>
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">E-mail</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@exemplo.com"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Senha</Label>
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
+                  {loading ? "CARREGANDO..." : "ENTRAR NO PAINEL"}
+                </Button>
+                
+                <div className="p-3 bg-secondary/10 rounded-lg border border-secondary/20 text-xs text-center space-y-1">
+                  <p className="font-bold text-secondary-foreground">Aviso:</p>
+                  <p className="text-muted-foreground">O acesso agora requer um usuário administrador cadastrado no banco de dados.</p>
+                </div>
 
-              <div className="flex flex-col gap-2 mt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowDiagnostics(!showDiagnostics)}
-                  className="w-full text-xs text-muted-foreground/60 hover:text-primary transition-colors text-center"
-                >
-                  {showDiagnostics ? "Ocultar Diagnóstico" : "Ver Diagnóstico de Conexão"}
-                </button>
+                <div className="flex flex-col gap-2 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowDiagnostics(!showDiagnostics)}
+                    className="w-full text-xs text-muted-foreground/60 hover:text-primary transition-colors text-center"
+                  >
+                    {showDiagnostics ? "Ocultar Diagnóstico" : "Ver Diagnóstico de Conexão"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-4">
+                <Button onClick={handleLogout} className="w-full py-6 font-bold">
+                  SAIR DA CONTA
+                </Button>
+                <Button variant="ghost" onClick={() => navigate({ to: "/" })} className="w-full">
+                  VOLTAR PARA O INÍCIO
+                </Button>
               </div>
-            </form>
+            )}
           </Card>
 
           {showDiagnostics && (

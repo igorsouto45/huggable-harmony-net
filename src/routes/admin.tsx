@@ -43,6 +43,7 @@ export const Route = createFileRoute("/admin")({
 function AdminLayout() {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState("");
@@ -56,14 +57,35 @@ function AdminLayout() {
       setShowDiagnostics(true);
     }
 
+    const checkAdmin = async (userId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', userId)
+          .maybeSingle();
+        
+        if (error) throw error;
+        setIsAdmin(data?.is_admin || false);
+      } catch (err) {
+        console.error("Error checking admin status:", err);
+        setIsAdmin(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     supabase.auth.getSession()
       .then(({ data: { session } }) => {
         setSession(session);
+        if (session) {
+          checkAdmin(session.user.id);
+        } else {
+          setLoading(false);
+        }
       })
       .catch((err) => {
         console.error("Error fetching session:", err);
-      })
-      .finally(() => {
         setLoading(false);
       });
 
@@ -71,6 +93,12 @@ function AdminLayout() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) {
+        checkAdmin(session.user.id);
+      } else {
+        setIsAdmin(false);
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();

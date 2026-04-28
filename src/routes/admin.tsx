@@ -172,7 +172,7 @@ function AdminLayout() {
     );
   }
 
-  if (!session) {
+  if (!session || isAdmin === false) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
         <div className="w-full max-w-md space-y-4">
@@ -182,10 +182,12 @@ function AdminLayout() {
                 PS
               </div>
               <h1 className="text-2xl font-black tracking-tight">PREMIA SEMPRE</h1>
-              <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
+              <p className="text-muted-foreground text-sm">
+                {isAdmin === false ? "Acesso negado. Você não é um administrador." : "Faça login para acessar o painel"}
+              </p>
             </div>
-            
-            <form onSubmit={handleAuth} className="space-y-4">
+            {!session ? (
+              <form onSubmit={handleAuth} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">E-mail</Label>
                 <Input 

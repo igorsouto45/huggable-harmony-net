@@ -43,6 +43,7 @@ export const Route = createFileRoute("/admin")({
 function AdminLayout() {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState("");
@@ -56,14 +57,35 @@ function AdminLayout() {
       setShowDiagnostics(true);
     }
 
+    const checkAdmin = async (userId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', userId)
+          .maybeSingle();
+        
+        if (error) throw error;
+        setIsAdmin(data?.is_admin || false);
+      } catch (err) {
+        console.error("Error checking admin status:", err);
+        setIsAdmin(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     supabase.auth.getSession()
       .then(({ data: { session } }) => {
         setSession(session);
+        if (session) {
+          checkAdmin(session.user.id);
+        } else {
+          setLoading(false);
+        }
       })
       .catch((err) => {
         console.error("Error fetching session:", err);
-      })
-      .finally(() => {
         setLoading(false);
       });
 
@@ -71,6 +93,12 @@ function AdminLayout() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) {
+        checkAdmin(session.user.id);
+      } else {
+        setIsAdmin(false);
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -144,7 +172,7 @@ function AdminLayout() {
     );
   }
 
-  if (!session) {
+  if (!session || isAdmin === false) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
         <div className="w-full max-w-md space-y-4">
@@ -154,51 +182,63 @@ function AdminLayout() {
                 PS
               </div>
               <h1 className="text-2xl font-black tracking-tight">PREMIA SEMPRE</h1>
-              <p className="text-muted-foreground text-sm">Faça login para acessar o painel</p>
+              <p className="text-muted-foreground text-sm">
+                {isAdmin === false ? "Acesso negado. Você não é um administrador." : "Faça login para acessar o painel"}
+              </p>
             </div>
-            
-            <form onSubmit={handleAuth} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@exemplo.com"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
-                {loading ? "CARREGANDO..." : "ENTRAR NO PAINEL"}
-              </Button>
-              
-              <div className="p-3 bg-secondary/10 rounded-lg border border-secondary/20 text-xs text-center space-y-1">
-                <p className="font-bold text-secondary-foreground">Aviso:</p>
-                <p className="text-muted-foreground">O acesso agora requer um usuário administrador cadastrado no banco de dados.</p>
-              </div>
+            {!session ? (
+              <form onSubmit={handleAuth} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">E-mail</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@exemplo.com"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Senha</Label>
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90 font-bold py-6" disabled={loading}>
+                  {loading ? "CARREGANDO..." : "ENTRAR NO PAINEL"}
+                </Button>
+                
+                <div className="p-3 bg-secondary/10 rounded-lg border border-secondary/20 text-xs text-center space-y-1">
+                  <p className="font-bold text-secondary-foreground">Aviso:</p>
+                  <p className="text-muted-foreground">O acesso agora requer um usuário administrador cadastrado no banco de dados.</p>
+                </div>
 
-              <div className="flex flex-col gap-2 mt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowDiagnostics(!showDiagnostics)}
-                  className="w-full text-xs text-muted-foreground/60 hover:text-primary transition-colors text-center"
-                >
-                  {showDiagnostics ? "Ocultar Diagnóstico" : "Ver Diagnóstico de Conexão"}
-                </button>
+                <div className="flex flex-col gap-2 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowDiagnostics(!showDiagnostics)}
+                    className="w-full text-xs text-muted-foreground/60 hover:text-primary transition-colors text-center"
+                  >
+                    {showDiagnostics ? "Ocultar Diagnóstico" : "Ver Diagnóstico de Conexão"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-4">
+                <Button onClick={handleLogout} className="w-full py-6 font-bold">
+                  SAIR DA CONTA
+                </Button>
+                <Button variant="ghost" onClick={() => navigate({ to: "/" })} className="w-full">
+                  VOLTAR PARA O INÍCIO
+                </Button>
               </div>
-            </form>
+            )}
           </Card>
 
           {showDiagnostics && (

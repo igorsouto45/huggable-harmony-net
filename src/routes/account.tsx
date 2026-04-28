@@ -34,11 +34,14 @@ function AccountLayout() {
   const [purchases, setPurchases] = useState<UserPurchase[]>([]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       if (session) fetchPurchases(session.user.id);
       setLoading(false);
-    });
+    };
+
+    checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
@@ -46,7 +49,7 @@ function AccountLayout() {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, []); // dependencies are empty because supabase.auth methods are stable and fetchPurchases is defined inside component but we can wrap it in useCallback if needed. For now, this is stable enough.
 
   const fetchPurchases = async (userId: string) => {
     // In a real app, we would fetch from a 'purchases' table joined with 'products'
